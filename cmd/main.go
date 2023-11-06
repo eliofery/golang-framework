@@ -22,6 +22,10 @@ func main() {
 	// Создание роутера
 	route := router.New()
 
+	// Пользовательский Middleware
+	route.Use(Middleware)
+
+	// Тестовый роут
 	route.Get("/", index)
 
 	// Запуск сервера
@@ -39,4 +43,12 @@ func index(ctx router.Ctx) error {
 	w.Write([]byte("Hello World 2"))
 
 	return nil
+}
+
+func Middleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("first middleware")
+
+		next.ServeHTTP(w, r)
+	})
 }
