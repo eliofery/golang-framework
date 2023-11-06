@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"github.com/eliofery/golang-image/pkg/config"
 	"github.com/eliofery/golang-image/pkg/logging"
+	"github.com/eliofery/golang-image/pkg/router"
 	"log"
-	"os"
+	"net/http"
 )
 
 func main() {
@@ -15,7 +17,26 @@ func main() {
 
 	// Создание логирования
 	log := logging.New("prod")
+	_ = log
 
-	// Тестирование лога и переменного окружения
-	log.Info(os.Getenv("ENV"))
+	// Создание роутера
+	route := router.New()
+
+	route.Get("/", index)
+
+	// Запуск сервера
+	log.Info("Сервер запущен: http://localhost:8080")
+	http.ListenAndServe(":8080", route.ServeHTTP())
+}
+
+func index(ctx router.Ctx) error {
+	w := router.GetResponse(ctx)
+	r := router.GetRequest(ctx)
+	_ = r
+
+	fmt.Println(w, r)
+
+	w.Write([]byte("Hello World 2"))
+
+	return nil
 }
