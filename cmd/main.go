@@ -36,7 +36,7 @@ func main() {
 
 func index(ctx router.Ctx) error {
 	w := router.Response(ctx)
-	r := router.GetRequest(ctx)
+	r := router.Request(ctx)
 
 	val := ctx.Value("test")
 	str, ok := val.(string)

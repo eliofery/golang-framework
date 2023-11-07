@@ -12,11 +12,7 @@ type Router struct {
 
 type Ctx context.Context
 type HandleCtx func(ctx Ctx) error
-
-const (
-	Resp = "response"
-	Req  = "request"
-)
+type key string
 
 func New() *Router {
 	return &Router{
@@ -28,7 +24,7 @@ func (chi *Router) handlerCtx(handler HandleCtx, w http.ResponseWriter, r *http.
 	ctx := r.Context()
 
 	ctx = WithResponse(ctx, w)
-	ctx = context.WithValue(ctx, Req, r)
+	ctx = WithRequest(ctx, r)
 
 	r = r.WithContext(ctx)
 
@@ -55,26 +51,4 @@ func (chi *Router) Use(middlewares ...func(http.Handler) http.Handler) {
 
 func (chi *Router) ServeHTTP() http.HandlerFunc {
 	return chi.Mux.ServeHTTP
-}
-
-func GetResponse(ctx Ctx) http.ResponseWriter {
-	val := ctx.Value(Resp)
-
-	resp, ok := val.(http.ResponseWriter)
-	if !ok {
-		return nil
-	}
-
-	return resp
-}
-
-func GetRequest(ctx Ctx) *http.Request {
-	val := ctx.Value(Req)
-
-	req, ok := val.(*http.Request)
-	if !ok {
-		return nil
-	}
-
-	return req
 }

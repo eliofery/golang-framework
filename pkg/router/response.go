@@ -5,8 +5,6 @@ import (
 	"net/http"
 )
 
-type key string
-
 const responseKey key = "response"
 
 func WithResponse(ctx context.Context, w http.ResponseWriter) context.Context {
