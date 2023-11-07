@@ -27,7 +27,7 @@ func New() *Router {
 func (chi *Router) handlerCtx(handler HandleCtx, w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, Resp, w)
+	ctx = WithResponse(ctx, w)
 	ctx = context.WithValue(ctx, Req, r)
 
 	r = r.WithContext(ctx)

@@ -35,7 +35,7 @@ func main() {
 }
 
 func index(ctx router.Ctx) error {
-	w := router.GetResponse(ctx)
+	w := router.Response(ctx)
 	r := router.GetRequest(ctx)
 
 	val := ctx.Value("test")

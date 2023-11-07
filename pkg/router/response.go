@@ -1,0 +1,25 @@
+package router
+
+import (
+	"context"
+	"net/http"
+)
+
+type key string
+
+const responseKey key = "response"
+
+func WithResponse(ctx context.Context, w http.ResponseWriter) context.Context {
+	return context.WithValue(ctx, responseKey, w)
+}
+
+func Response(ctx context.Context) http.ResponseWriter {
+	val := ctx.Value(responseKey)
+
+	resp, ok := val.(http.ResponseWriter)
+	if !ok {
+		return nil
+	}
+
+	return resp
+}
