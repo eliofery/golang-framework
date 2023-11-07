@@ -27,6 +27,9 @@ func main() {
 	// Пользовательский Middleware
 	route.Use(Middleware)
 
+	// Ресурсы
+	tpl.AssetsFsInit(route.Mux)
+
 	// Тестовый роут
 	route.Get("/", index)
 
