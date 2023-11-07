@@ -6,6 +6,7 @@ import (
 	"github.com/eliofery/golang-image/pkg/config"
 	"github.com/eliofery/golang-image/pkg/logging"
 	"github.com/eliofery/golang-image/pkg/router"
+	"github.com/eliofery/golang-image/pkg/tpl"
 	"log"
 	"net/http"
 )
@@ -35,20 +36,18 @@ func main() {
 }
 
 func index(ctx router.Ctx) error {
-	w := router.Response(ctx)
-	r := router.Request(ctx)
-
 	val := ctx.Value("test")
-	str, ok := val.(string)
-	if !ok {
-		return nil
+	str := val.(string)
+
+	data := struct {
+		Test string
+	}{
+		Test: str,
 	}
 
-	_ = r
+	err := tpl.Render(ctx, "home", data)
 
-	w.Write([]byte("Hello World " + str))
-
-	return nil
+	return err
 }
 
 func Middleware(next http.Handler) http.Handler {
