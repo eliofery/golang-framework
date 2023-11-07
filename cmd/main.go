@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/eliofery/golang-image/pkg/config"
 	"github.com/eliofery/golang-image/pkg/logging"
@@ -36,11 +37,16 @@ func main() {
 func index(ctx router.Ctx) error {
 	w := router.GetResponse(ctx)
 	r := router.GetRequest(ctx)
+
+	val := ctx.Value("test")
+	str, ok := val.(string)
+	if !ok {
+		return nil
+	}
+
 	_ = r
 
-	fmt.Println(w, r)
-
-	w.Write([]byte("Hello World 2"))
+	w.Write([]byte("Hello World " + str))
 
 	return nil
 }
@@ -48,6 +54,9 @@ func index(ctx router.Ctx) error {
 func Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("first middleware")
+
+		ctx := context.WithValue(r.Context(), "test", "Тест передачи контекста через middleware прошел успешно")
+		r = r.WithContext(ctx)
 
 		next.ServeHTTP(w, r)
 	})
