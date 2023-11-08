@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/eliofery/golang-image/pkg/config"
 	"github.com/eliofery/golang-image/pkg/database"
-	"github.com/eliofery/golang-image/pkg/database/sqlite"
+	"github.com/eliofery/golang-image/pkg/database/postgres"
 	"github.com/eliofery/golang-image/pkg/logging"
 	"github.com/eliofery/golang-image/pkg/router"
 	"github.com/eliofery/golang-image/pkg/tpl"
@@ -27,15 +27,31 @@ func main() {
 	logger := logging.New("prod")
 	_ = logger
 
-	// Подключение к БД
-	driver := sqlite.New()
+	//// Подключение к БД SQLite
+	//driver := sqlite.New()
+	//db, err := database.Init(driver)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//
+	//// Миграция БД SQLite
+	//if err = database.MigrateFS(db, goose.DialectSQLite3); err != nil {
+	//	log.Fatal(err)
+	//}
+
+	// Подключение к БД Postgres
+	driver, err := postgres.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	db, err := database.Init(driver)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Миграция БД
-	if err = database.MigrateFS(db, goose.DialectSQLite3); err != nil {
+	// Миграция БД Postgres
+	if err = database.MigrateFS(db, goose.DialectPostgres); err != nil {
 		log.Fatal(err)
 	}
 
