@@ -10,6 +10,7 @@ import (
 	"github.com/eliofery/golang-image/pkg/router"
 	"github.com/eliofery/golang-image/pkg/tpl"
 	"github.com/gorilla/csrf"
+	"github.com/pressly/goose/v3"
 	"log"
 	"net/http"
 	"os"
@@ -27,12 +28,16 @@ func main() {
 	_ = logger
 
 	// Подключение к БД
-	db := sqlite.New()
-	connect, err := database.Init(db)
+	driver := sqlite.New()
+	db, err := database.Init(driver)
 	if err != nil {
 		log.Fatal(err)
 	}
-	_ = connect
+
+	// Миграция БД
+	if err = database.MigrateFS(db, goose.DialectSQLite3); err != nil {
+		log.Fatal(err)
+	}
 
 	// Создание роутера
 	route := router.New()
