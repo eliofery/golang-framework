@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/eliofery/golang-image/pkg/config"
+	"github.com/eliofery/golang-image/pkg/database"
+	"github.com/eliofery/golang-image/pkg/database/sqlite"
 	"github.com/eliofery/golang-image/pkg/logging"
 	"github.com/eliofery/golang-image/pkg/router"
 	"github.com/eliofery/golang-image/pkg/tpl"
@@ -21,8 +23,16 @@ func main() {
 	}
 
 	// Создание логирования
-	log := logging.New("prod")
-	_ = log
+	logger := logging.New("prod")
+	_ = logger
+
+	// Подключение к БД
+	db := sqlite.New()
+	connect, err := database.Init(db)
+	if err != nil {
+		log.Fatal(err)
+	}
+	_ = connect
 
 	// Создание роутера
 	route := router.New()
@@ -40,7 +50,7 @@ func main() {
 	route.Post("/", post)
 
 	// Запуск сервера
-	log.Info("Сервер запущен: http://localhost:8080")
+	logger.Info("Сервер запущен: http://localhost:8080")
 	http.ListenAndServe(":8080", route.ServeHTTP())
 }
 
