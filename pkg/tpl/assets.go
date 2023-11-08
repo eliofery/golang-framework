@@ -6,17 +6,17 @@ import (
 	"net/http"
 )
 
-const (
-	assetsDir = "internal/resources/assets"
-	pattern   = "/assets/*"
-	prefix    = "/assets/"
+var (
+	assetsDir     = pathJoin("internal/resources/assets")
+	assetsPrefix  = "/assets/"
+	assetsPattern = assetsPrefix + "*"
 )
 
 func AssetsInit(route *chi.Mux) {
 	fs := http.FileServer(http.Dir(assetsDir))
-	route.Handle(pattern, http.StripPrefix(prefix, fs))
+	route.Handle(assetsPattern, http.StripPrefix(assetsPrefix, fs))
 }
 
 func AssetsFsInit(route *chi.Mux) {
-	route.Handle(pattern, http.FileServer(http.FS(resources.Assets)))
+	route.Handle(assetsPattern, http.FileServer(http.FS(resources.Assets)))
 }

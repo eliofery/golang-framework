@@ -2,8 +2,10 @@ package tpl
 
 import (
 	"github.com/eliofery/golang-image/internal/resources"
+	"html/template"
 	"io/fs"
 	"log"
+	"net/http"
 	"path"
 	"strings"
 )
@@ -51,4 +53,19 @@ func (t *Tpl) getAllFiles() []string {
 	files = append(files, t.parts...)
 
 	return files
+}
+
+func getFuncMap(r *http.Request) template.FuncMap {
+	var fMap = template.FuncMap{}
+
+	for key, callback := range funcMap {
+		cb, ok := callback.(func(*http.Request) funcTemplate)
+		if !ok {
+			continue
+		}
+
+		fMap[key] = cb(r)
+	}
+
+	return fMap
 }

@@ -7,8 +7,11 @@ import (
 	"github.com/eliofery/golang-image/pkg/logging"
 	"github.com/eliofery/golang-image/pkg/router"
 	"github.com/eliofery/golang-image/pkg/tpl"
+	"github.com/gorilla/csrf"
 	"log"
 	"net/http"
+	"os"
+	"strconv"
 )
 
 func main() {
@@ -25,6 +28,8 @@ func main() {
 	route := router.New()
 
 	// Пользовательский Middleware
+	csrfSecure, _ := strconv.ParseBool(os.Getenv("CSRF_SECURE"))
+	route.Use(csrf.Protect([]byte(os.Getenv("CSRF_KEY")), csrf.Secure(csrfSecure)))
 	route.Use(Middleware)
 
 	// Ресурсы
@@ -32,6 +37,7 @@ func main() {
 
 	// Тестовый роут
 	route.Get("/", index)
+	route.Post("/", post)
 
 	// Запуск сервера
 	log.Info("Сервер запущен: http://localhost:8080")
@@ -51,6 +57,17 @@ func index(ctx router.Ctx) error {
 	err := tpl.Render(ctx, "home", data)
 
 	return err
+}
+
+func post(ctx router.Ctx) error {
+	w := router.ResponseWriter(ctx)
+	r := router.Request(ctx)
+
+	value := r.FormValue("test")
+
+	w.Write([]byte(value))
+
+	return nil
 }
 
 func Middleware(next http.Handler) http.Handler {
