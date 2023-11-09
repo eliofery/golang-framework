@@ -4,7 +4,8 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "build": "tailwindcss -i ./internal/resources/assets/css/tailwind.css -o ./internal/resources/assets/css/style.css --minify"
+        "build": "tailwindcss -i ./internal/resources/assets/css/tailwind.css -o ./internal/resources/assets/css/style.css --minify",
+        "watch": "modd"
     },
     "keywords": [],
     "author": "",

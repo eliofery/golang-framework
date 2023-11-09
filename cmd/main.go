@@ -25,7 +25,6 @@ func main() {
 
 	// Создание логирования
 	logger := logging.New("prod")
-	_ = logger
 
 	//// Подключение к БД SQLite
 	//driver := sqlite.New()
