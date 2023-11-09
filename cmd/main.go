@@ -54,6 +54,32 @@ func main() {
 		log.Fatal(err)
 	}
 
+	//// Отправка почты
+	//emailService, err := email.New()
+	//if err != nil {
+	//    logger.Info("не удалось создать подключение к smtp", err)
+	//}
+	//
+	//mail := email.Email{
+	//    From: "support@example.kz",
+	//    To: "guest@example.kz",
+	//    Subject: "Регистрация на сайте",
+	//    Plaintext: `
+	//        Регистрация прошла успешно.
+	//
+	//        Добро пожаловать к нам на сайт, рады вас видеть.
+	//    `,
+	//    HTML: `
+	//        <h1>Регистрация прошла успешно.</h1>
+	//
+	//        <p>Добро пожаловать к нам на сайт, рады вас видеть.</p>
+	//    `,
+	//}
+	//err = emailService.Send(mail)
+	//if err != nil {
+	//    logger.Info("не удалось отправить почту", err)
+	//}
+
 	// Создание роутера
 	route := router.New()
 
