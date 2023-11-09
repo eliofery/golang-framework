@@ -3,9 +3,14 @@
 <p>Описание страницы</p>
 <p>{{.Test}}</p>
 
-<form action="/" method="post">
+<form
+  action="/"
+  method="post">
   {{csrfInput}}
-  <input type="text" name="test">
+  <input
+    class="border-2 border-cyan-950"
+    type="text"
+    name="test">
   <button type="submit">Отправить</button>
 </form>
 {{end}}
