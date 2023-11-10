@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/eliofery/golang-image/pkg/config"
+	"github.com/eliofery/golang-image/pkg/cookie"
 	"github.com/eliofery/golang-image/pkg/database"
 	"github.com/eliofery/golang-image/pkg/database/postgres"
 	"github.com/eliofery/golang-image/pkg/logging"
@@ -118,6 +119,16 @@ func index(ctx router.Ctx) error {
 		Test: str,
 	}
 
+	w := router.ResponseWriter(ctx)
+	r := router.Request(ctx)
+
+	// Чтение куки
+	res, _ := cookie.Get(r, "test")
+	fmt.Println(res)
+
+	// Удаление куки
+	cookie.Delete(w, "test")
+
 	err := tpl.Render(ctx, "home", data)
 
 	return err
@@ -126,6 +137,9 @@ func index(ctx router.Ctx) error {
 func post(ctx router.Ctx) error {
 	w := router.ResponseWriter(ctx)
 	r := router.Request(ctx)
+
+	// Добавление куки
+	cookie.Set(w, "test", "2685723587236582730")
 
 	value := r.FormValue("test")
 
