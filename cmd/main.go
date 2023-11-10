@@ -7,6 +7,7 @@ import (
 	"github.com/eliofery/golang-image/pkg/database"
 	"github.com/eliofery/golang-image/pkg/database/postgres"
 	"github.com/eliofery/golang-image/pkg/logging"
+	"github.com/eliofery/golang-image/pkg/rand"
 	"github.com/eliofery/golang-image/pkg/router"
 	"github.com/eliofery/golang-image/pkg/tpl"
 	"github.com/gorilla/csrf"
@@ -79,6 +80,13 @@ func main() {
 	//if err != nil {
 	//    logger.Info("не удалось отправить почту", err)
 	//}
+
+	// Получение токена
+	token, err := rand.SessionToken()
+	if err != nil {
+		logger.Info("не удалось получить токен", err)
+	}
+	fmt.Println(token)
 
 	// Создание роутера
 	route := router.New()
