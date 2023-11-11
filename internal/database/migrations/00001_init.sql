@@ -1,7 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE info(
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     value TEXT
 );
 -- +goose StatementEnd

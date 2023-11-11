@@ -8,6 +8,10 @@ import (
 	"strconv"
 )
 
+const (
+	Port = 5432
+)
+
 type Storage struct {
 	Host     string
 	Port     int
@@ -17,10 +21,10 @@ type Storage struct {
 	SSLMode  string
 }
 
-func New() (*Storage, error) {
+func New() *Storage {
 	port, err := strconv.Atoi(os.Getenv("POSTGRES_PORT"))
 	if err != nil {
-		return nil, err
+		port = Port
 	}
 
 	return &Storage{
@@ -30,7 +34,7 @@ func New() (*Storage, error) {
 		Password: os.Getenv("POSTGRES_PASSWORD"),
 		Database: os.Getenv("POSTGRES_DATABASE"),
 		SSLMode:  os.Getenv("POSTGRES_SSLMODE"),
-	}, nil
+	}
 }
 
 func (d *Storage) Init() (*sql.DB, error) {

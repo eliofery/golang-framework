@@ -29,7 +29,7 @@ func Migrate(db *sql.DB, dialect goose.Dialect) error {
 	}
 
 	if err := goose.Up(db, pathMigrations); err != nil {
-		panic(err)
+		return err
 	}
 
 	return nil

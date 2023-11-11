@@ -12,7 +12,6 @@ type Router struct {
 
 type Ctx context.Context
 type HandleCtx func(ctx Ctx) error
-type key string
 
 func New() *Router {
 	return &Router{

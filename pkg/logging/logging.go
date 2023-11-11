@@ -5,17 +5,23 @@ import (
 	"os"
 )
 
-var logging *slog.Logger
+const (
+	Dev  = "dev"
+	Prod = "prod"
+)
 
-func New(env string) *slog.Logger {
-	var slHandler slog.Handler
+func New() *slog.Logger {
+	var (
+		logging   *slog.Logger
+		slHandler slog.Handler
+	)
 
-	switch env {
-	case "dev":
+	switch os.Getenv("ENV") {
+	case Dev:
 		slHandler = slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 			Level: slog.LevelDebug,
 		})
-	case "prod":
+	case Prod:
 		slHandler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 			Level: slog.LevelInfo,
 		})

@@ -5,10 +5,12 @@ import (
 	"net/http"
 )
 
+type key string
+
 const requestKey key = "request"
 
-func WithRequest(ctx context.Context, w *http.Request) context.Context {
-	return context.WithValue(ctx, requestKey, w)
+func WithRequest(ctx context.Context, r *http.Request) context.Context {
+	return context.WithValue(ctx, requestKey, r)
 }
 
 func Request(ctx context.Context) *http.Request {
