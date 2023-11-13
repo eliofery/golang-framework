@@ -11,10 +11,7 @@ const (
 )
 
 func New() *slog.Logger {
-	var (
-		logging   *slog.Logger
-		slHandler slog.Handler
-	)
+	var slHandler slog.Handler
 
 	switch os.Getenv("ENV") {
 	case Dev:
@@ -27,7 +24,5 @@ func New() *slog.Logger {
 		})
 	}
 
-	logging = slog.New(slHandler)
-
-	return logging
+	return slog.New(slHandler)
 }

@@ -38,11 +38,13 @@ func New() *Storage {
 }
 
 func (d *Storage) Init() (*sql.DB, error) {
+	op := "postgres.Init"
+
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s", d.Host, d.Port, d.User, d.Password, d.Database, d.SSLMode)
 
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return db, nil

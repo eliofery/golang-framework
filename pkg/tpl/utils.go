@@ -1,10 +1,10 @@
 package tpl
 
 import (
+	"fmt"
 	"github.com/eliofery/golang-image/internal/resources"
 	"html/template"
 	"io/fs"
-	"log"
 	"net/http"
 	"path"
 	"strings"
@@ -34,10 +34,12 @@ func getPage(page string) string {
 	return path.Join(pathPages, pathJoin(page)+fileExt)
 }
 
-func getParts() []string {
+func getParts() ([]string, error) {
+	op := "tpl.getParts"
+
 	parts, err := fs.ReadDir(resources.Views, pathParts)
 	if err != nil {
-		log.Println("Error reading folder parts:", err)
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	partsNew := make([]string, 0, len(parts))
@@ -45,7 +47,7 @@ func getParts() []string {
 		partsNew = append(partsNew, path.Join(pathParts, part.Name()))
 	}
 
-	return partsNew
+	return partsNew, nil
 }
 
 func (t *Tpl) getAllFiles() []string {

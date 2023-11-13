@@ -1,9 +1,14 @@
 package email
 
 import (
+	"fmt"
 	"github.com/go-mail/mail/v2"
 	"os"
 	"strconv"
+)
+
+const (
+	Port = 25
 )
 
 type Email struct {
@@ -18,10 +23,10 @@ type Service struct {
 	dialer *mail.Dialer
 }
 
-func New() (*Service, error) {
+func New() *Service {
 	port, err := strconv.Atoi(os.Getenv("SMTP_PORT"))
 	if err != nil {
-		return &Service{}, err
+		port = Port
 	}
 
 	return &Service{
@@ -31,10 +36,12 @@ func New() (*Service, error) {
 			Username: os.Getenv("SMTP_USERNAME"),
 			Password: os.Getenv("SMTP_PASSWORD"),
 		},
-	}, nil
+	}
 }
 
 func (es *Service) Send(email Email) error {
+	op := "email.Send"
+
 	msg := mail.NewMessage()
 
 	msg.SetHeader("From", email.From)
@@ -52,7 +59,7 @@ func (es *Service) Send(email Email) error {
 	}
 
 	if err := es.dialer.DialAndSend(msg); err != nil {
-		return err
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	return nil

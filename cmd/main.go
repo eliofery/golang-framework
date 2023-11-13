@@ -75,6 +75,8 @@ func main() {
 }
 
 func index(ctx router.Ctx) error {
+	op := "indexHandler"
+
 	w := router.ResponseWriter(ctx)
 	r := router.Request(ctx)
 	l := logging.Logging(ctx)
@@ -84,7 +86,7 @@ func index(ctx router.Ctx) error {
 	res := db.QueryRow("SELECT value FROM info WHERE id = 2")
 	err := res.Scan(&value)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s: %w", op, err)
 	}
 	fmt.Println(value)
 
@@ -115,9 +117,10 @@ func index(ctx router.Ctx) error {
 }
 
 func post(ctx router.Ctx) error {
+	op := "postHandler"
+
 	w := router.ResponseWriter(ctx)
 	r := router.Request(ctx)
-	l := logging.Logging(ctx)
 
 	// Добавление куки
 	cookie.Set(w, "test", "2685723587236582730")
@@ -125,10 +128,7 @@ func post(ctx router.Ctx) error {
 	value := r.FormValue("test")
 
 	// Отправка почты
-	emailService, err := email.New()
-	if err != nil {
-		l.Info("не удалось создать подключение к smtp", err)
-	}
+	emailService := email.New()
 	_ = emailService
 
 	mail := email.Email{
@@ -152,9 +152,9 @@ func post(ctx router.Ctx) error {
 	//   l.Info("не удалось отправить почту", err)
 	//}
 
-	_, err = w.Write([]byte(value))
+	_, err := w.Write([]byte(value))
 	if err != nil {
-		return err
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	return nil

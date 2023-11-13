@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/eliofery/golang-image/internal/database"
 	"github.com/pressly/goose/v3"
 )
@@ -15,21 +16,25 @@ type Database interface {
 }
 
 func Init(driver Database) (*sql.DB, error) {
+	op := "database.Init"
+
 	db, err := driver.Init()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return db, nil
 }
 
 func Migrate(db *sql.DB, dialect goose.Dialect) error {
+	op := "database.Migrate"
+
 	if err := goose.SetDialect(string(dialect)); err != nil {
-		return err
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	if err := goose.Up(db, pathMigrations); err != nil {
-		return err
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	return nil

@@ -3,13 +3,16 @@ package rand
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 )
 
 func Bytes(n int) ([]byte, error) {
+	op := "rand.Bytes"
+
 	b := make([]byte, n)
 
 	if _, err := rand.Read(b); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return b, nil

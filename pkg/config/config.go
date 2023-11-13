@@ -1,13 +1,14 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"github.com/joho/godotenv"
 	"os"
 )
 
 var (
-	ErrNotFound = fmt.Errorf("не удалось загрузить файл .env")
+	ErrNotFound = errors.New("не удалось загрузить файл .env")
 )
 
 const (
@@ -15,6 +16,8 @@ const (
 )
 
 func Init() error {
+	op := "config.Init"
+
 	var env string
 
 	if len(os.Args) == 1 {
@@ -24,7 +27,7 @@ func Init() error {
 	}
 
 	if err := godotenv.Load(env); err != nil {
-		return ErrNotFound
+		return fmt.Errorf("%s: %w", op, ErrNotFound)
 	}
 
 	return nil
