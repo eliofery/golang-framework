@@ -12,6 +12,17 @@ import (
 	"path"
 )
 
+type Data struct {
+	Meta   Meta
+	Data   any
+	Errors []string
+}
+
+type Meta struct {
+	Title       string
+	Description string
+}
+
 type Tpl struct {
 	layout string
 	page   string
@@ -40,7 +51,7 @@ func (t *Tpl) SetLayout(layout string) *Tpl {
 	}
 }
 
-func (t *Tpl) Render(ctx context.Context, data any) error {
+func (t *Tpl) Render(ctx context.Context, data Data) error {
 	op := "tpl.Render"
 
 	w := router.ResponseWriter(ctx)
@@ -48,7 +59,7 @@ func (t *Tpl) Render(ctx context.Context, data any) error {
 
 	layoutFileName := path.Base(t.getAllFiles()[0])
 	tpl := template.New(layoutFileName)
-	tpl = tpl.Funcs(getFuncMap(r))
+	tpl = tpl.Funcs(getFuncMap(r, data))
 
 	tpl, err := tpl.ParseFS(resources.Views, t.getAllFiles()...)
 	if err != nil {
@@ -67,6 +78,6 @@ func (t *Tpl) Render(ctx context.Context, data any) error {
 	return nil
 }
 
-func Render(ctx context.Context, page string, data any) error {
+func Render(ctx context.Context, page string, data Data) error {
 	return New(page).Render(ctx, data)
 }

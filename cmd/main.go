@@ -96,10 +96,20 @@ func index(ctx router.Ctx) error {
 		l.Info("не удалось получить токен", err)
 	}
 
-	data := struct {
-		Test string
-	}{
-		Test: token,
+	data := tpl.Data{
+		Meta: tpl.Meta{
+			Title: "Главная",
+		},
+		Data: struct {
+			Token string
+		}{
+			Token: token,
+		},
+		Errors: []string{
+			"ошибка 1",
+			"ошибка 2",
+			"ошибка 3",
+		},
 	}
 
 	// Чтение куки

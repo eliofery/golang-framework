@@ -6,16 +6,23 @@ import (
 	"net/http"
 )
 
-type funcTemplate func() template.HTML
+type funcTemplate any
 
 var (
 	funcMap = template.FuncMap{
 		"csrfInput": csrfInput,
+		"errors":    errors,
 	}
 )
 
-func csrfInput(r *http.Request) funcTemplate {
+func csrfInput(r *http.Request, _ Data) funcTemplate {
 	return func() template.HTML {
 		return csrf.TemplateField(r)
+	}
+}
+
+func errors(_ *http.Request, data Data) funcTemplate {
+	return func() []string {
+		return data.Errors
 	}
 }

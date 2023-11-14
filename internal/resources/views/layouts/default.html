@@ -1,16 +1,18 @@
 <!doctype html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Заголовок страницы</title>
-  <link rel="stylesheet" href="/assets/css/style.css">
-</head>
-<body>
-{{template "header"}}
-<main class="container mx-auto">
-  {{template "page" .}}
-</main>
-{{template "footer"}}
-</body>
+  <head>
+    <meta charset="UTF-8">
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0">
+    <title>{{.Meta.Title}}</title>
+    <link
+      rel="stylesheet"
+      href="/assets/css/style.css">
+  </head>
+  <body>
+    {{template "header"}}
+    <main class="container mx-auto">{{template "page" .}}</main>
+    {{template "footer"}}
+  </body>
 </html>

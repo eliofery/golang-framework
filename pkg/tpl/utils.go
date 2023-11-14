@@ -57,16 +57,16 @@ func (t *Tpl) getAllFiles() []string {
 	return files
 }
 
-func getFuncMap(r *http.Request) template.FuncMap {
+func getFuncMap(r *http.Request, data Data) template.FuncMap {
 	var fMap = template.FuncMap{}
 
 	for key, callback := range funcMap {
-		cb, ok := callback.(func(*http.Request) funcTemplate)
+		cb, ok := callback.(func(*http.Request, Data) funcTemplate)
 		if !ok {
 			continue
 		}
 
-		fMap[key] = cb(r)
+		fMap[key] = cb(r, data)
 	}
 
 	return fMap
