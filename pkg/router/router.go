@@ -2,6 +2,7 @@ package router
 
 import (
 	"context"
+	"github.com/eliofery/golang-image/pkg/logging"
 	"github.com/go-chi/chi/v5"
 	"net/http"
 )
@@ -28,6 +29,9 @@ func (chi *Router) handlerCtx(handler HandleCtx, w http.ResponseWriter, r *http.
 	r = r.WithContext(ctx)
 
 	if err := handler(r.Context()); err != nil {
+		logging.Logging(ctx).Error(err.Error())
+
+		// TODO сделать вывод ошибки через html шаблон
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
