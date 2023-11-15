@@ -1,5 +1,34 @@
 {{define "header"}}
 <header class="bg-cyan-900 text-white">
-  Шапка
+  <ul class="container mx-auto flex justify-between py-5">
+    <li>
+      <a
+        class="hover:underline"
+        href="/"
+        >Главная</a
+      >
+    </li>
+    <li>
+      <a
+        class="hover:underline"
+        href="/user"
+        >Профиль</a
+      >
+    </li>
+    <li>
+      <a
+        class="hover:underline"
+        href="/signin"
+        >Авторизация</a
+      >
+    </li>
+    <li>
+      <a
+        class="hover:underline"
+        href="/signup"
+        >Регистрация</a
+      >
+    </li>
+  </ul>
 </header>
 {{end}}
