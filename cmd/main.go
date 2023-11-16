@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"github.com/eliofery/golang-image/internal/app/http/controllers/home"
+	"github.com/eliofery/golang-image/internal/app/http/controllers/user"
 	mw "github.com/eliofery/golang-image/internal/app/http/middleware"
 	"github.com/eliofery/golang-image/pkg/config"
 	"github.com/eliofery/golang-image/pkg/database"
@@ -61,6 +62,7 @@ func main() {
 	// Роуты
 	route.Get("/", home.Index)
 	route.Post("/", home.Post)
+	route.Get("/signup", user.SignUp)
 
 	// Запуск сервера
 	logger.Info("Сервер запущен: http://localhost:8080")
