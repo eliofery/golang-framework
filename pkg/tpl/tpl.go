@@ -12,17 +12,6 @@ import (
 	"path"
 )
 
-type Data struct {
-	Meta   Meta
-	Data   any
-	Errors []string
-}
-
-type Meta struct {
-	Title       string
-	Description string
-}
-
 type Tpl struct {
 	layout string
 	page   string

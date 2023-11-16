@@ -31,4 +31,11 @@
     </li>
   </ul>
 </header>
-{{end}}
+
+{{if errors}}
+<ul class="container mx-auto my-10">
+  {{range errors}}
+  <li class="p-2 my-1 border-s-red-950 bg-red-900 text-red-300">{{.}}</li>
+  {{end}}
+</ul>
+{{end}} {{end}}

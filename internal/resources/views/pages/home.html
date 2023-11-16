@@ -3,14 +3,6 @@
 <p>Описание страницы</p>
 <p>{{.Data.Token}}</p>
 
-{{if errors}}
-<ul class="my-10">
-  {{range errors}}
-  <li>{{.}}</li>
-  {{end}}
-</ul>
-{{end}}
-
 <form
   action="/"
   method="post">
