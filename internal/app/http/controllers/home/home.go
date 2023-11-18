@@ -12,20 +12,11 @@ import (
 )
 
 func Index(ctx router.Ctx) error {
-	op := "indexHandler"
-
 	w := router.ResponseWriter(ctx)
 	r := router.Request(ctx)
 	l := logging.Logging(ctx)
 	db := database.CtxDatabase(ctx)
-
-	var value string
-	res := db.QueryRow("SELECT value FROM info WHERE id = 2")
-	err := res.Scan(&value)
-	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
-	}
-	fmt.Println(value)
+	_ = db
 
 	// Получение токена
 	token, err := rand.SessionToken()
@@ -42,20 +33,16 @@ func Index(ctx router.Ctx) error {
 		}{
 			Token: token,
 		},
-		Errors: []string{
+		Errors: tpl.PublicErrors(
 			"ошибка 1",
 			"ошибка 2",
 			"ошибка 3",
-		},
+		),
 	}
 
 	// Чтение куки
 	ck, _ := cookie.Get(r, "test")
-	if ck != "" {
-		fmt.Println(res)
-	} else {
-		fmt.Println("нет куки")
-	}
+	fmt.Println(ck)
 
 	// Удаление куки
 	cookie.Delete(w, "test")

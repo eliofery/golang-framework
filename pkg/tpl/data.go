@@ -1,5 +1,7 @@
 package tpl
 
+import "github.com/eliofery/golang-image/pkg/errors"
+
 type Data struct {
 	Meta   Meta
 	Data   any
@@ -9,4 +11,14 @@ type Data struct {
 type Meta struct {
 	Title       string
 	Description string
+}
+
+func PublicErrors(err ...string) []error {
+	var errMsg []error
+
+	for _, e := range err {
+		errMsg = append(errMsg, errors.Public(errors.New(e), e))
+	}
+
+	return errMsg
 }
