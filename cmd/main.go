@@ -12,6 +12,7 @@ import (
 	"github.com/eliofery/golang-image/pkg/router"
 	"github.com/eliofery/golang-image/pkg/tpl"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-playground/validator/v10"
 	"github.com/pressly/goose/v3"
 	"log"
 	"net/http"
@@ -44,6 +45,9 @@ func main() {
 		logger.Error(err.Error())
 	}
 
+	// Подключение валидатора
+	validate := validator.New(validator.WithRequiredStructEnabled())
+
 	// Создание роутера
 	route := router.New()
 
@@ -53,7 +57,7 @@ func main() {
 	route.Use(middleware.Logger)
 	route.Use(middleware.Recoverer)
 	route.Use(middleware.URLFormat)
-	route.Use(mw.Bind(logger, db))
+	route.Use(mw.Bind(logger, db, validate))
 	route.Use(mw.Csrf)
 
 	// Подключение ресурсов
