@@ -2,7 +2,6 @@ package user
 
 import (
 	"github.com/eliofery/golang-image/internal/app/models/user"
-	"github.com/eliofery/golang-image/pkg/database"
 	"github.com/eliofery/golang-image/pkg/logging"
 	"github.com/eliofery/golang-image/pkg/router"
 	"github.com/eliofery/golang-image/pkg/tpl"
@@ -22,9 +21,7 @@ func Create(ctx router.Ctx) error {
 	r := router.Request(ctx)
 	l := logging.Logging(ctx)
 
-	modelUser := user.New(database.CtxDatabase(ctx))
-	modelUser.Email = r.FormValue("email")
-	modelUser.Password = r.FormValue("password")
+	modelUser := user.New(ctx)
 
 	err := modelUser.SignUp()
 	if err != nil {

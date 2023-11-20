@@ -1,9 +1,13 @@
 package user
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
+	"github.com/eliofery/golang-image/pkg/database"
 	"github.com/eliofery/golang-image/pkg/errors"
+	"github.com/eliofery/golang-image/pkg/router"
+	"github.com/eliofery/golang-image/pkg/validate"
+	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"golang.org/x/crypto/bcrypt"
@@ -15,24 +19,38 @@ var (
 )
 
 type Dto struct {
-	ID       uint
-	Email    string
-	Password string
+	ID       uint   `validate:"omitempty"`
+	Email    string `validate:"required,email"`
+	Password string `validate:"required,gte=10"`
 }
 
 type User struct {
-	db *sql.DB
+	ctx context.Context
 	Dto
 }
 
-func New(db *sql.DB) *User {
+func New(ctx context.Context) *User {
+	r := router.Request(ctx)
+
 	return &User{
-		db: db,
+		ctx: ctx,
+		Dto: Dto{
+			Email:    r.FormValue("email"),
+			Password: r.FormValue("password"),
+		},
 	}
 }
 
 func (u *User) SignUp() error {
 	op := "model.user.SignUp"
+
+	db := database.CtxDatabase(u.ctx)
+	valid := validate.Validation(u.ctx)
+
+	err := valid.Struct(u.Dto)
+	if err != nil {
+		return err.(validator.ValidationErrors)
+	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -42,7 +60,7 @@ func (u *User) SignUp() error {
 	u.Email = strings.ToLower(u.Email)
 	u.Password = string(hashedPassword)
 
-	row := u.db.QueryRow(
+	row := db.QueryRow(
 		`INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id`, u.Email, u.Password,
 	)
 	err = row.Scan(&u.ID)
