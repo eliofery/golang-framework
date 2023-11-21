@@ -11,19 +11,27 @@
     <input
       class="p-2 border-2 border-cyan-950"
       id="email"
-      type="email"
+      type="text"
       name="email"
       placeholder="Введите ваш email">
   </p>
+  {{if error .Errors "Email"}}
+  <p class="p-2 my-1 border-s-red-950 bg-red-900 text-red-300">{{error .Errors "Email"}}</p>
+  {{end}}
+
   <p class="flex flex-col my-5 gap-y-0.5">
     <label for="password">Пароль</label>
     <input
       class="p-2 border-2 border-cyan-950"
       id="password"
-      type="password"
+      type="text"
       name="password"
       placeholder="Введите ваш пароль">
   </p>
+  {{if error .Errors "Password"}}
+  <p class="p-2 my-1 border-s-red-950 bg-red-900 text-red-300">{{error .Errors "Password"}}</p>
+  {{end}}
+
   <p class="my-8">
     <button
       class="block p-3 text-white bg-cyan-950 hover:bg-cyan-800"

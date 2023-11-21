@@ -2,7 +2,8 @@ package tpl
 
 import (
 	"github.com/eliofery/golang-image/pkg/errors"
-	"github.com/eliofery/golang-image/pkg/logging"
+	"github.com/eliofery/golang-image/pkg/validate"
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/csrf"
 	"html/template"
 	"net/http"
@@ -14,6 +15,7 @@ var (
 	funcMap = template.FuncMap{
 		"csrfInput": csrfInput,
 		"errors":    errorsMsg,
+		"error":     errorMsg,
 	}
 )
 
@@ -23,30 +25,78 @@ func csrfInput(r *http.Request, _ Data) funcTemplate {
 	}
 }
 
+/*
+Пример использования:
+{{if errors}}
+<ul>
+
+	{{range errors}}
+	<li>{{.}}</li>
+	{{end}}
+
+</ul>
+{{end}}
+*/
 func errorsMsg(r *http.Request, data Data) funcTemplate {
 	var (
 		ErrSomeWrong = errors.New("что то пошло не так")
 
-		errMessage []string
-		pubErr     errors.PublicError
+		errMessages  []string
+		pubErr       errors.PublicError
+		validatorErr validator.ValidationErrors
 	)
 
-	ctx := r.Context()
-	l := logging.Logging(ctx)
+	trans := validate.Rus(r.Context())
 
 	for _, err := range data.Errors {
-		if errors.As(err, &pubErr) {
-			l.Info(pubErr.Public())
-
-			errMessage = append(errMessage, pubErr.Public())
-		} else {
-			l.Error(pubErr.Error())
-
-			errMessage = append(errMessage, ErrSomeWrong.Error())
+		switch {
+		case errors.As(err, &validatorErr):
+			for _, err := range validatorErr {
+				errMessages = append(errMessages, err.Translate(trans))
+			}
+		case errors.As(err, &pubErr):
+			errMessages = append(errMessages, pubErr.Public())
+		default:
+			errMessages = append(errMessages, ErrSomeWrong.Error())
 		}
 	}
 
 	return func() []string {
-		return errMessage
+		return errMessages
+	}
+}
+
+/*
+Пример использования:
+
+	type Dto struct {
+	    Email    string `validate:"required,email"`
+	}
+
+<input id="email"r type="text" name="email" placeholder="Введите ваш email">
+{{if error .Errors "Email"}}
+
+	<p>{{error .Errors "Email"}}</p>
+
+{{end}}
+*/
+func errorMsg(r *http.Request, _ Data) funcTemplate {
+	var (
+		validatorErr validator.ValidationErrors
+	)
+
+	errMessages := map[string]string{}
+	trans := validate.Rus(r.Context())
+
+	return func(errs []error, key string) string {
+		for _, err := range errs {
+			if errors.As(err, &validatorErr) {
+				for _, err := range validatorErr {
+					errMessages[err.Field()] = err.Translate(trans)
+				}
+			}
+		}
+
+		return errMessages[key]
 	}
 }
