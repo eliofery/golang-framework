@@ -13,6 +13,18 @@ type Meta struct {
 	Description string
 }
 
+/*
+PublicErrors
+Пример использования:
+
+	data := tpl.Data{
+	    Errors: tpl.PublicErrors(
+	        "ошибка 1",
+	        "ошибка 2",
+	        "ошибка 3",
+	    ),
+	}
+*/
 func PublicErrors(err ...string) []error {
 	var errMsg []error
 

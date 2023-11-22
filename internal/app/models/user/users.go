@@ -7,7 +7,6 @@ import (
 	"github.com/eliofery/golang-image/pkg/errors"
 	"github.com/eliofery/golang-image/pkg/router"
 	"github.com/eliofery/golang-image/pkg/validate"
-	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"golang.org/x/crypto/bcrypt"
@@ -21,7 +20,7 @@ var (
 type Dto struct {
 	ID       uint   `validate:"omitempty"`
 	Email    string `validate:"required,email"`
-	Password string `validate:"required,gte=10"`
+	Password string `validate:"required,gte=10,lte=32"`
 }
 
 type User struct {
@@ -41,15 +40,15 @@ func New(ctx context.Context) *User {
 	}
 }
 
-func (u *User) SignUp() error {
-	op := "model.user.SignUp"
+func (u *User) Create() error {
+	op := "model.user.Create"
 
 	db := database.CtxDatabase(u.ctx)
 	valid := validate.Validation(u.ctx)
 
 	err := valid.Struct(u.Dto)
 	if err != nil {
-		return err.(validator.ValidationErrors)
+		return err
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
