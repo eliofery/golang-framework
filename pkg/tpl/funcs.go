@@ -39,7 +39,7 @@ func csrfInput(r *http.Request, _ Data) funcTemplate {
 */
 func errorsMsg(r *http.Request, data Data) funcTemplate {
 	var (
-		ErrSomeWrong = errors.New("что то пошло не так")
+		ErrSomeWrong = errors.New("Непредвиденная ошибка на стороне сервера")
 
 		errMessages  []string
 		pubErr       errors.PublicError

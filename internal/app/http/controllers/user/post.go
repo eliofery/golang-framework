@@ -14,13 +14,13 @@ func Create(ctx router.Ctx) error {
 	l := logging.Logging(ctx)
 
 	modelUser := user.New(ctx)
-
 	err := modelUser.Create()
 	if err != nil {
 		l.Error(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 
 		return tpl.Render(ctx, "user/signup", tpl.Data{
+			Data:   modelUser.Dto,
 			Errors: []error{err},
 		})
 	}

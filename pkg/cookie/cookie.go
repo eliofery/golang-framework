@@ -10,6 +10,10 @@ var (
 	ErrCookieNotFound = errors.New("cookie не найдено")
 )
 
+const (
+	Session = "session"
+)
+
 func New(name, value string) *http.Cookie {
 	return &http.Cookie{
 		Name:     name,
