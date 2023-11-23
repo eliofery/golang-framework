@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"fmt"
+	"github.com/eliofery/golang-image/internal/app/models/session"
 	"github.com/eliofery/golang-image/pkg/database"
 	"github.com/eliofery/golang-image/pkg/errors"
 	"github.com/eliofery/golang-image/pkg/router"
@@ -71,6 +72,12 @@ func (u *User) Create() error {
 			}
 		}
 		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	modelSession := session.New(u.ctx)
+	err = modelSession.Create(u.ID)
+	if err != nil {
+		return err
 	}
 
 	return nil
