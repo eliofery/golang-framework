@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"github.com/eliofery/golang-image/internal/app/models/session"
 	"github.com/eliofery/golang-image/pkg/database"
@@ -16,6 +17,7 @@ import (
 
 var (
 	ErrEmailAlreadyExists = errors.New("email адрес уже существует")
+	ErrLoginOrPassword    = errors.New("неверный логин или пароль")
 )
 
 type Dto struct {
@@ -72,6 +74,43 @@ func (u *User) Create() error {
 			}
 		}
 		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	modelSession := session.New(u.ctx)
+	err = modelSession.Create(u.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *User) Auth() error {
+	op := "model.user.Auth"
+
+	db := database.CtxDatabase(u.ctx)
+	valid := validate.Validation(u.ctx)
+
+	err := valid.Struct(u.Dto)
+	if err != nil {
+		return err
+	}
+
+	u.Email = strings.ToLower(u.Email)
+	password := u.Password
+
+	row := db.QueryRow("SELECT * FROM users WHERE email = $1", u.Email)
+	err = row.Scan(&u.ID, &u.Email, &u.Password)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return errors.Public(err, ErrLoginOrPassword.Error())
+		}
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+	if err != nil {
+		return errors.Public(err, ErrLoginOrPassword.Error())
 	}
 
 	modelSession := session.New(u.ctx)

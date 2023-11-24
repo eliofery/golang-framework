@@ -16,10 +16,32 @@ func Create(ctx router.Ctx) error {
 	modelUser := user.New(ctx)
 	err := modelUser.Create()
 	if err != nil {
-		l.Error(err.Error())
+		l.Info(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 
 		return tpl.Render(ctx, "user/signup", tpl.Data{
+			Data:   modelUser.Dto,
+			Errors: []error{err},
+		})
+	}
+
+	http.Redirect(w, r, "/user", http.StatusFound)
+
+	return nil
+}
+
+func Auth(ctx router.Ctx) error {
+	w := router.ResponseWriter(ctx)
+	r := router.Request(ctx)
+	l := logging.Logging(ctx)
+
+	modelUser := user.New(ctx)
+	err := modelUser.Auth()
+	if err != nil {
+		l.Info(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+
+		return tpl.Render(ctx, "user/signin", tpl.Data{
 			Data:   modelUser.Dto,
 			Errors: []error{err},
 		})
