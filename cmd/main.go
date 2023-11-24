@@ -66,9 +66,14 @@ func main() {
 	// Роуты
 	route.Get("/", home.Index)
 	route.Post("/", home.Post)
+
 	route.Get("/user", user.Index)
+
 	route.Get("/signup", user.SignUp)
 	route.Post("/signup", user.Create)
+
+	route.Get("/signin", user.SignIn)
+	route.Post("/signin", user.Auth)
 
 	// Запуск сервера
 	logger.Info("Сервер запущен: http://localhost:8080")

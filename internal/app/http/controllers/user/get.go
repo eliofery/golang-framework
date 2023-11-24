@@ -12,3 +12,7 @@ func Index(ctx router.Ctx) error {
 func SignUp(ctx router.Ctx) error {
 	return tpl.Render(ctx, "user/signup", tpl.Data{})
 }
+
+func SignIn(ctx router.Ctx) error {
+	return tpl.Render(ctx, "user/signin", tpl.Data{})
+}
