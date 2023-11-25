@@ -20,7 +20,7 @@ func New() *Router {
 	}
 }
 
-func (chi *Router) handlerCtx(handler HandleCtx, w http.ResponseWriter, r *http.Request) {
+func (rt *Router) handlerCtx(handler HandleCtx, w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	ctx = WithResponse(ctx, w)
@@ -36,22 +36,37 @@ func (chi *Router) handlerCtx(handler HandleCtx, w http.ResponseWriter, r *http.
 	}
 }
 
-func (chi *Router) Get(path string, handler HandleCtx) {
-	chi.Mux.Get(path, func(w http.ResponseWriter, r *http.Request) {
-		chi.handlerCtx(handler, w, r)
+func (rt *Router) Get(path string, handler HandleCtx) {
+	rt.Mux.Get(path, func(w http.ResponseWriter, r *http.Request) {
+		rt.handlerCtx(handler, w, r)
 	})
 }
 
-func (chi *Router) Post(path string, handler HandleCtx) {
-	chi.Mux.Post(path, func(w http.ResponseWriter, r *http.Request) {
-		chi.handlerCtx(handler, w, r)
+func (rt *Router) Post(path string, handler HandleCtx) {
+	rt.Mux.Post(path, func(w http.ResponseWriter, r *http.Request) {
+		rt.handlerCtx(handler, w, r)
 	})
 }
 
-func (chi *Router) Use(middlewares ...func(http.Handler) http.Handler) {
-	chi.Mux.Use(middlewares...)
+func (rt *Router) Use(middlewares ...func(http.Handler) http.Handler) {
+	rt.Mux.Use(middlewares...)
 }
 
-func (chi *Router) ServeHTTP() http.HandlerFunc {
-	return chi.Mux.ServeHTTP
+func (rt *Router) Route(pattern string, fn func(r *Router)) *chi.Mux {
+	subRouter := newRouter()
+
+	fn(subRouter)
+	rt.Mux.Mount(pattern, subRouter.Mux)
+
+	return subRouter.Mux
+}
+
+func newRouter() *Router {
+	return &Router{
+		Mux: chi.NewRouter(),
+	}
+}
+
+func (rt *Router) ServeHTTP() http.HandlerFunc {
+	return rt.Mux.ServeHTTP
 }

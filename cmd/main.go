@@ -67,7 +67,11 @@ func main() {
 	route.Get("/", home.Index)
 	route.Post("/", home.Post)
 
-	route.Get("/user", user.Index)
+	route.Route("/user", func(r *router.Router) {
+		r.Mux.Use(mw.Auth)
+
+		r.Get("/", user.Index)
+	})
 
 	route.Get("/signup", user.SignUp)
 	route.Post("/signup", user.Create)
