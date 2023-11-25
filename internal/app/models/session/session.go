@@ -10,44 +10,42 @@ import (
 	"github.com/eliofery/golang-image/pkg/validate"
 )
 
-type Dto struct {
+type Session struct {
 	ID        uint   `validate:"omitempty"`
 	UserID    uint   `validate:"required,min=1"`
 	TokenHash string `validate:"required"`
 }
 
-type Session struct {
+type service struct {
 	ctx context.Context
-	Dto
+	Session
 }
 
-func New(ctx context.Context) *Session {
-	return &Session{
-		ctx: ctx,
+func New(ctx context.Context, session Session) *service {
+	return &service{
+		ctx:     ctx,
+		Session: session,
 	}
 }
 
-func (s *Session) Create(userID uint) error {
-	op := "model.session.Create"
+func (s *service) Create() error {
+	op := "model.session.SignUp"
 
-	w := router.ResponseWriter(s.ctx)
-	db := database.CtxDatabase(s.ctx)
-	valid := validate.Validation(s.ctx)
+	w, d, v := router.ResponseWriter(s.ctx), database.CtxDatabase(s.ctx), validate.Validation(s.ctx)
 
 	token, err := rand.SessionToken()
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	s.UserID = userID
 	s.TokenHash = rand.HashToken(token)
 
-	err = valid.Struct(s.Dto)
+	err = v.Struct(s.Session)
 	if err != nil {
 		return err
 	}
 
-	row := db.QueryRow(`
+	row := d.QueryRow(`
         INSERT INTO sessions (user_id, token_hash) VALUES ($1, $2)
         ON CONFLICT (user_id) DO
         UPDATE SET token_hash = $2

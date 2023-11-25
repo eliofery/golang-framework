@@ -9,18 +9,20 @@ import (
 )
 
 func Create(ctx router.Ctx) error {
-	w := router.ResponseWriter(ctx)
-	r := router.Request(ctx)
-	l := logging.Logging(ctx)
+	w, r, l := router.ResponseWriter(ctx), router.Request(ctx), logging.Logging(ctx)
 
-	modelUser := user.New(ctx)
-	err := modelUser.Create()
+	service := user.New(ctx, user.User{
+		Email:    r.FormValue("email"),
+		Password: r.FormValue("password"),
+	})
+
+	err := service.SignUp()
 	if err != nil {
 		l.Info(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 
 		return tpl.Render(ctx, "user/signup", tpl.Data{
-			Data:   modelUser.Dto,
+			Data:   service.User,
 			Errors: []error{err},
 		})
 	}
@@ -31,18 +33,20 @@ func Create(ctx router.Ctx) error {
 }
 
 func Auth(ctx router.Ctx) error {
-	w := router.ResponseWriter(ctx)
-	r := router.Request(ctx)
-	l := logging.Logging(ctx)
+	w, r, l := router.ResponseWriter(ctx), router.Request(ctx), logging.Logging(ctx)
 
-	modelUser := user.New(ctx)
-	err := modelUser.Auth()
+	service := user.New(ctx, user.User{
+		Email:    r.FormValue("email"),
+		Password: r.FormValue("password"),
+	})
+
+	err := service.SignIn()
 	if err != nil {
 		l.Info(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 
 		return tpl.Render(ctx, "user/signin", tpl.Data{
-			Data:   modelUser.Dto,
+			Data:   service.User,
 			Errors: []error{err},
 		})
 	}
