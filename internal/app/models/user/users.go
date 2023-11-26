@@ -7,6 +7,7 @@ import (
 	"github.com/eliofery/golang-image/internal/app/models/session"
 	"github.com/eliofery/golang-image/pkg/database"
 	"github.com/eliofery/golang-image/pkg/errors"
+	"github.com/eliofery/golang-image/pkg/rand"
 	"github.com/eliofery/golang-image/pkg/validate"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -107,6 +108,27 @@ func (u *service) SignIn() error {
 	err = session.New(u.ctx, session.Session{UserID: u.ID}).Create()
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (u *service) Auth(token string) error {
+	op := "model.session.Auth"
+
+	d := database.CtxDatabase(u.ctx)
+
+	tokenHash := rand.HashToken(token)
+
+	row := d.QueryRow(`
+       SELECT users.id, users.email, users.password
+       FROM users
+       INNER JOIN sessions ON users.id = sessions.user_id
+       WHERE sessions.token_hash = $1;
+   `, tokenHash)
+	err := row.Scan(&u.ID, &u.Email, &u.Password)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	return nil
