@@ -26,19 +26,19 @@ type User struct {
 	Password string `validate:"required,gte=10,lte=32"`
 }
 
-type service struct {
+type Service struct {
 	ctx context.Context
 	User
 }
 
-func New(ctx context.Context, user User) *service {
-	return &service{
+func New(ctx context.Context, user User) *Service {
+	return &Service{
 		ctx:  ctx,
 		User: user,
 	}
 }
 
-func (u *service) SignUp() error {
+func (u *Service) SignUp() error {
 	op := "model.user.SignUp"
 
 	d, v := database.CtxDatabase(u.ctx), validate.Validation(u.ctx)
@@ -78,7 +78,7 @@ func (u *service) SignUp() error {
 	return nil
 }
 
-func (u *service) SignIn() error {
+func (u *Service) SignIn() error {
 	op := "model.user.SignIn"
 
 	d, v := database.CtxDatabase(u.ctx), validate.Validation(u.ctx)
@@ -113,7 +113,7 @@ func (u *service) SignIn() error {
 	return nil
 }
 
-func (u *service) Auth(token string) error {
+func (u *Service) Auth(token string) error {
 	op := "model.session.Auth"
 
 	d := database.CtxDatabase(u.ctx)

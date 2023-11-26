@@ -16,19 +16,19 @@ type Session struct {
 	TokenHash string `validate:"required"`
 }
 
-type service struct {
+type Service struct {
 	ctx context.Context
 	Session
 }
 
-func New(ctx context.Context, session Session) *service {
-	return &service{
+func New(ctx context.Context, session Session) *Service {
+	return &Service{
 		ctx:     ctx,
 		Session: session,
 	}
 }
 
-func (s *service) Create() error {
+func (s *Service) Create() error {
 	op := "model.session.SignUp"
 
 	w, d, v := router.ResponseWriter(s.ctx), database.CtxDatabase(s.ctx), validate.Validation(s.ctx)
