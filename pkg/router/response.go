@@ -7,7 +7,7 @@ import (
 
 const responseKey key = "response"
 
-func WithResponse(ctx context.Context, w http.ResponseWriter) context.Context {
+func WithResponseWriter(ctx context.Context, w http.ResponseWriter) context.Context {
 	return context.WithValue(ctx, responseKey, w)
 }
 

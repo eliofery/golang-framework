@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/eliofery/golang-image/internal/app/models/session"
+	"github.com/eliofery/golang-image/pkg/cookie"
 	"github.com/eliofery/golang-image/pkg/database"
 	"github.com/eliofery/golang-image/pkg/errors"
 	"github.com/eliofery/golang-image/pkg/rand"
@@ -12,6 +13,7 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"golang.org/x/crypto/bcrypt"
+	"net/http"
 	"strings"
 )
 
@@ -28,36 +30,35 @@ type User struct {
 
 type Service struct {
 	ctx context.Context
-	User
 }
 
-func New(ctx context.Context, user User) *Service {
+func NewService(ctx context.Context) *Service {
 	return &Service{
-		ctx:  ctx,
-		User: user,
+		ctx: ctx,
 	}
 }
 
-func (u *Service) SignUp() error {
+func (s *Service) SignUp(user *User) error {
 	op := "model.user.SignUp"
 
-	d, v := database.CtxDatabase(u.ctx), validate.Validation(u.ctx)
+	d, v := database.CtxDatabase(s.ctx), validate.Validation(s.ctx)
 
-	err := v.Struct(u.User)
+	err := v.Struct(user)
 	if err != nil {
 		return err
 	}
 
-	u.Email = strings.ToLower(u.Email)
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+	user.Email = strings.ToLower(user.Email)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	row := d.QueryRow(
-		`INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id`, u.Email, string(hashedPassword),
+		`INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id`,
+		user.Email, string(hashedPassword),
 	)
-	err = row.Scan(&u.ID)
+	err = row.Scan(&user.ID)
 	if err != nil {
 		var pgError *pgconn.PgError
 
@@ -70,7 +71,7 @@ func (u *Service) SignUp() error {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	err = session.New(u.ctx, session.Session{UserID: u.ID}).Create()
+	err = session.NewService(s.ctx).Create(&session.Session{UserID: user.ID})
 	if err != nil {
 		return err
 	}
@@ -78,21 +79,21 @@ func (u *Service) SignUp() error {
 	return nil
 }
 
-func (u *Service) SignIn() error {
+func (s *Service) SignIn(user *User) error {
 	op := "model.user.SignIn"
 
-	d, v := database.CtxDatabase(u.ctx), validate.Validation(u.ctx)
+	d, v := database.CtxDatabase(s.ctx), validate.Validation(s.ctx)
 
-	err := v.Struct(u.User)
+	err := v.Struct(user)
 	if err != nil {
 		return err
 	}
 
-	u.Email = strings.ToLower(u.Email)
-	password := u.Password
+	user.Email = strings.ToLower(user.Email)
+	password := user.Password
 
-	row := d.QueryRow("SELECT * FROM users WHERE email = $1", u.Email)
-	err = row.Scan(&u.ID, &u.Email, &u.Password)
+	row := d.QueryRow("SELECT * FROM users WHERE email = $1", user.Email)
+	err = row.Scan(&user.ID, &user.Email, &user.Password)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return errors.Public(err, ErrLoginOrPassword.Error())
@@ -100,12 +101,12 @@ func (u *Service) SignIn() error {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
 		return errors.Public(err, ErrLoginOrPassword.Error())
 	}
 
-	err = session.New(u.ctx, session.Session{UserID: u.ID}).Create()
+	err = session.NewService(s.ctx).Create(&session.Session{UserID: user.ID})
 	if err != nil {
 		return err
 	}
@@ -113,23 +114,28 @@ func (u *Service) SignIn() error {
 	return nil
 }
 
-func (u *Service) Auth(token string) error {
-	op := "model.session.Auth"
+func GetCurrentUser(r *http.Request) (*User, error) {
+	op := "model.user.CurrentUser"
 
-	d := database.CtxDatabase(u.ctx)
-
+	token, err := cookie.Get(r, cookie.Session)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
 	tokenHash := rand.HashToken(token)
 
+	userData := User{}
+
+	d := database.CtxDatabase(r.Context())
 	row := d.QueryRow(`
        SELECT users.id, users.email, users.password
        FROM users
        INNER JOIN sessions ON users.id = sessions.user_id
        WHERE sessions.token_hash = $1;
    `, tokenHash)
-	err := row.Scan(&u.ID, &u.Email, &u.Password)
+	err = row.Scan(&userData.ID, &userData.Email, &userData.Password)
 	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return nil
+	return &userData, nil
 }

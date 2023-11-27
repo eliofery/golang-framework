@@ -11,18 +11,19 @@ import (
 func Create(ctx router.Ctx) error {
 	w, r, l := router.ResponseWriter(ctx), router.Request(ctx), logging.Logging(ctx)
 
-	service := user.New(ctx, user.User{
+	userData := user.User{
 		Email:    r.FormValue("email"),
 		Password: r.FormValue("password"),
-	})
+	}
 
-	err := service.SignUp()
+	service := user.NewService(ctx)
+	err := service.SignUp(&userData)
 	if err != nil {
 		l.Info(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 
 		return tpl.Render(ctx, "user/signup", tpl.Data{
-			Data:   service.User,
+			Data:   userData,
 			Errors: []error{err},
 		})
 	}
@@ -35,18 +36,19 @@ func Create(ctx router.Ctx) error {
 func Auth(ctx router.Ctx) error {
 	w, r, l := router.ResponseWriter(ctx), router.Request(ctx), logging.Logging(ctx)
 
-	service := user.New(ctx, user.User{
+	userData := user.User{
 		Email:    r.FormValue("email"),
 		Password: r.FormValue("password"),
-	})
+	}
 
-	err := service.SignIn()
+	service := user.NewService(ctx)
+	err := service.SignIn(&userData)
 	if err != nil {
 		l.Info(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 
 		return tpl.Render(ctx, "user/signin", tpl.Data{
-			Data:   service.User,
+			Data:   userData,
 			Errors: []error{err},
 		})
 	}

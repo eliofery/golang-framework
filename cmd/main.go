@@ -57,8 +57,8 @@ func main() {
 	route.Use(middleware.Logger)
 	route.Use(middleware.Recoverer)
 	route.Use(middleware.URLFormat)
-	route.Use(mw.Bind(logger, db, validate))
 	route.Use(mw.Csrf)
+	route.Use(mw.Inject(logger, db, validate))
 
 	// Подключение ресурсов
 	tpl.AssetsFsInit(route.Mux)

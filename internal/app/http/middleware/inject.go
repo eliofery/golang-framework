@@ -10,7 +10,7 @@ import (
 	"net/http"
 )
 
-func Bind(logger *slog.Logger, db *sql.DB, validator *validator.Validate) func(next http.Handler) http.Handler {
+func Inject(logger *slog.Logger, db *sql.DB, validator *validator.Validate) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := logging.WithLogging(r.Context(), logger)

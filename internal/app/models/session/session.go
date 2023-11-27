@@ -18,17 +18,15 @@ type Session struct {
 
 type Service struct {
 	ctx context.Context
-	Session
 }
 
-func New(ctx context.Context, session Session) *Service {
+func NewService(ctx context.Context) *Service {
 	return &Service{
-		ctx:     ctx,
-		Session: session,
+		ctx: ctx,
 	}
 }
 
-func (s *Service) Create() error {
+func (s *Service) Create(session *Session) error {
 	op := "model.session.SignUp"
 
 	w, d, v := router.ResponseWriter(s.ctx), database.CtxDatabase(s.ctx), validate.Validation(s.ctx)
@@ -38,9 +36,9 @@ func (s *Service) Create() error {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	s.TokenHash = rand.HashToken(token)
+	session.TokenHash = rand.HashToken(token)
 
-	err = v.Struct(s.Session)
+	err = v.Struct(session)
 	if err != nil {
 		return err
 	}
@@ -49,9 +47,9 @@ func (s *Service) Create() error {
         INSERT INTO sessions (user_id, token_hash) VALUES ($1, $2)
         ON CONFLICT (user_id) DO
         UPDATE SET token_hash = $2
-        RETURNING id;
-    `, s.UserID, s.TokenHash)
-	err = row.Scan(&s.ID)
+        RETURNING id;`,
+		session.UserID, session.TokenHash)
+	err = row.Scan(&session.ID)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}

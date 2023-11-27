@@ -23,8 +23,13 @@ func New() *Router {
 func (rt *Router) handlerCtx(handler HandleCtx, w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	ctx = WithResponse(ctx, w)
-	ctx = WithRequest(ctx, r)
+	if ResponseWriter(ctx) == nil {
+		ctx = WithResponseWriter(ctx, w)
+	}
+
+	if Request(ctx) == nil {
+		ctx = WithRequest(ctx, r)
+	}
 
 	r = r.WithContext(ctx)
 
