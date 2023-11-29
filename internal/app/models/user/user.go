@@ -117,13 +117,13 @@ func (s *Service) SignIn(user *User) error {
 func GetCurrentUser(r *http.Request) (*User, error) {
 	op := "model.user.CurrentUser"
 
+	userData := &User{}
+
 	token, err := cookie.Get(r, cookie.Session)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return userData, fmt.Errorf("%s: %w", op, err)
 	}
 	tokenHash := rand.HashToken(token)
-
-	userData := User{}
 
 	d := database.CtxDatabase(r.Context())
 	row := d.QueryRow(`
@@ -134,8 +134,8 @@ func GetCurrentUser(r *http.Request) (*User, error) {
    `, tokenHash)
 	err = row.Scan(&userData.ID, &userData.Email, &userData.Password)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return userData, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return &userData, nil
+	return userData, nil
 }

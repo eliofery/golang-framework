@@ -3,16 +3,16 @@
   <head>
     <meta charset="UTF-8">
     <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0">
+      content="width=device-width, initial-scale=1.0"
+      name="viewport">
     <title>{{.Meta.Title}}</title>
     <link
-      rel="stylesheet"
-      href="/assets/css/style.css">
+      href="/assets/css/style.css"
+      rel="stylesheet">
   </head>
   <body>
-    {{template "header"}}
+    {{template "header" .}}
     <main class="container mx-auto my-14">{{template "page" .}}</main>
-    {{template "footer"}}
+    {{template "footer" .}}
   </body>
 </html>
