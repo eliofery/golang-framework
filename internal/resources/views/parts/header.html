@@ -8,6 +8,7 @@
         >Главная</a
       >
     </li>
+    {{if currentUser}}
     <li>
       <a
         class="hover:underline"
@@ -15,6 +16,7 @@
         >Профиль</a
       >
     </li>
+    {{else}}
     <li>
       <a
         class="hover:underline"
@@ -29,6 +31,7 @@
         >Регистрация</a
       >
     </li>
+    {{end}}
   </ul>
 </header>
 

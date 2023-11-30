@@ -1,6 +1,7 @@
 package tpl
 
 import (
+	"github.com/eliofery/golang-image/internal/app/models/user"
 	"github.com/eliofery/golang-image/pkg/errors"
 	"github.com/eliofery/golang-image/pkg/validate"
 	"github.com/go-playground/validator/v10"
@@ -13,9 +14,10 @@ type funcTemplate any
 
 var (
 	funcMap = template.FuncMap{
-		"csrfInput": csrfInput,
-		"errors":    errorsMsg,
-		"error":     errorMsg,
+		"csrfInput":   csrfInput,
+		"errors":      errorsMsg,
+		"error":       errorMsg,
+		"currentUser": currentUser,
 	}
 )
 
@@ -98,5 +100,11 @@ func errorMsg(r *http.Request, _ Data) funcTemplate {
 		}
 
 		return errMessages[key]
+	}
+}
+
+func currentUser(r *http.Request, _ Data) funcTemplate {
+	return func() *user.User {
+		return user.CtxUser(r.Context())
 	}
 }
