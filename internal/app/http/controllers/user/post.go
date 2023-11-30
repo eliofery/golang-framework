@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/eliofery/golang-image/internal/app/models/user"
+	"github.com/eliofery/golang-image/pkg/cookie"
 	"github.com/eliofery/golang-image/pkg/logging"
 	"github.com/eliofery/golang-image/pkg/router"
 	"github.com/eliofery/golang-image/pkg/tpl"
@@ -54,6 +55,16 @@ func Auth(ctx router.Ctx) error {
 	}
 
 	http.Redirect(w, r, "/user", http.StatusFound)
+
+	return nil
+}
+
+func Logout(ctx router.Ctx) error {
+	w := router.ResponseWriter(ctx)
+
+	cookie.Delete(w, cookie.Session)
+
+	http.Redirect(w, router.Request(ctx), "/signin", http.StatusFound)
 
 	return nil
 }
