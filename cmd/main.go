@@ -59,6 +59,7 @@ func main() {
 	route.Use(middleware.URLFormat)
 	route.Use(mw.Csrf)
 	route.Use(mw.Inject(logger, db, validate))
+	route.Use(mw.SetUser)
 
 	// Подключение ресурсов
 	tpl.AssetsFsInit(route.Mux)
@@ -71,13 +72,18 @@ func main() {
 		r.Mux.Use(mw.Auth)
 
 		r.Get("/", user.Index)
+		r.Post("/logout", user.Logout)
 	})
 
-	route.Get("/signup", user.SignUp)
-	route.Post("/signup", user.Create)
+	route.Route("/", func(r *router.Router) {
+		r.Mux.Use(mw.Guest)
 
-	route.Get("/signin", user.SignIn)
-	route.Post("/signin", user.Auth)
+		r.Get("/signup", user.SignUp)
+		r.Post("/signup", user.Create)
+
+		r.Get("/signin", user.SignIn)
+		r.Post("/signin", user.Auth)
+	})
 
 	// Запуск сервера
 	logger.Info("Сервер запущен: http://localhost:8080")
