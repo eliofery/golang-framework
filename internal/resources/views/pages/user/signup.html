@@ -13,7 +13,7 @@
       id="email"
       type="text"
       name="email"
-      value="{{if .Data}}{{.Data.Email}}{{end}}"
+      value="{{if and .Data .Data.Email}}{{.Data.Email}}{{end}}"
       placeholder="Введите ваш email">
   </p>
   {{if error .Errors "Email"}}
