@@ -83,6 +83,9 @@ func main() {
 
 		r.Get("/signin", user.SignIn)
 		r.Post("/signin", user.Auth)
+
+		r.Get("/forgot-pw", user.ForgotPassword)
+		r.Post("/forgot-pw", user.ProcessForgotPassword)
 	})
 
 	// Запуск сервера

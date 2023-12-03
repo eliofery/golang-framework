@@ -62,7 +62,7 @@ func Post(ctx router.Ctx) error {
 	value := r.FormValue("test")
 
 	// Отправка почты
-	emailService := email.New()
+	emailService := email.NewService()
 	_ = emailService
 
 	mail := email.Email{

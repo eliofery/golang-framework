@@ -23,7 +23,7 @@ type Service struct {
 	dialer *mail.Dialer
 }
 
-func New() *Service {
+func NewService() *Service {
 	port, err := strconv.Atoi(os.Getenv("SMTP_PORT"))
 	if err != nil {
 		port = Port

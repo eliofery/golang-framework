@@ -1,6 +1,7 @@
 package user
 
 import (
+	pwreset "github.com/eliofery/golang-image/internal/app/models/password_reset"
 	"github.com/eliofery/golang-image/internal/app/models/user"
 	"github.com/eliofery/golang-image/pkg/cookie"
 	"github.com/eliofery/golang-image/pkg/logging"
@@ -67,4 +68,28 @@ func Logout(ctx router.Ctx) error {
 	http.Redirect(w, router.Request(ctx), "/signin", http.StatusFound)
 
 	return nil
+}
+
+func ProcessForgotPassword(ctx router.Ctx) error {
+	r, w, l := router.Request(ctx), router.ResponseWriter(ctx), logging.Logging(ctx)
+
+	userData := user.User{
+		Email: r.FormValue("email"),
+	}
+
+	service := pwreset.NewService(ctx)
+	err := service.Create(&userData)
+	if err != nil {
+		l.Info(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+
+		return tpl.Render(ctx, "user/forgot-pw", tpl.Data{
+			Data:   userData,
+			Errors: []error{err},
+		})
+	}
+
+	return tpl.Render(ctx, "user/check-email", tpl.Data{
+		Data: userData,
+	})
 }

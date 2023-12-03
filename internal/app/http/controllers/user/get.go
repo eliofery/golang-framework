@@ -16,3 +16,7 @@ func SignUp(ctx router.Ctx) error {
 func SignIn(ctx router.Ctx) error {
 	return tpl.Render(ctx, "user/signin", tpl.Data{})
 }
+
+func ForgotPassword(ctx router.Ctx) error {
+	return tpl.Render(ctx, "user/forgot-pw", tpl.Data{})
+}
