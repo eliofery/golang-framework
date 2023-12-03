@@ -7,6 +7,7 @@ import (
 	"github.com/eliofery/golang-image/internal/app/models/session"
 	"github.com/eliofery/golang-image/pkg/cookie"
 	"github.com/eliofery/golang-image/pkg/database"
+	"github.com/eliofery/golang-image/pkg/email"
 	"github.com/eliofery/golang-image/pkg/errors"
 	"github.com/eliofery/golang-image/pkg/rand"
 	"github.com/eliofery/golang-image/pkg/validate"
@@ -14,6 +15,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -38,27 +40,27 @@ func NewService(ctx context.Context) *Service {
 	}
 }
 
-func (s *Service) SignUp(user *User) error {
-	op := "model.user.SignUp"
+func (s *Service) SignUp(us *User) error {
+	op := "model.us.SignUp"
 
 	d, v := database.CtxDatabase(s.ctx), validate.Validation(s.ctx)
 
-	err := v.Struct(user)
+	err := v.Struct(us)
 	if err != nil {
 		return err
 	}
 
-	user.Email = strings.ToLower(user.Email)
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	us.Email = strings.ToLower(us.Email)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(us.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	row := d.QueryRow(
 		`INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id`,
-		user.Email, string(hashedPassword),
+		us.Email, string(hashedPassword),
 	)
-	err = row.Scan(&user.ID)
+	err = row.Scan(&us.ID)
 	if err != nil {
 		var pgError *pgconn.PgError
 
@@ -71,7 +73,35 @@ func (s *Service) SignUp(user *User) error {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	err = session.NewService(s.ctx).Create(&session.Session{UserID: user.ID})
+	emailService := email.NewService()
+	err = emailService.Send(email.Email{
+		From:    os.Getenv("EMAIL_SUPPORT"),
+		To:      us.Email,
+		Subject: "Регистрация на сайте",
+		Plaintext: `
+            Вы зарегистрировались на сайте.
+
+            Добро пожаловать к нам на сайт.
+            Приятного время провождения.
+
+            Почта: ` + us.Email + `
+            Пароль: ` + us.Password + `
+        `,
+		HTML: `
+	       <h1>Вы зарегистрировались на сайте.</h1>
+
+	       <p>Добро пожаловать к нам на сайт.</p>
+	       <p>Приятного время провождения.
+
+            <p><b>Почта:</b> ` + us.Email + `</p>
+            <p><b>Пароль:</b> ` + us.Password + `</p>
+        `,
+	})
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	err = session.NewService(s.ctx).Create(&session.Session{UserID: us.ID})
 	if err != nil {
 		return err
 	}
