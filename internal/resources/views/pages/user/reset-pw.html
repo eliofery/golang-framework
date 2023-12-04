@@ -1,0 +1,55 @@
+{{define "page"}}
+<h1 class="mb-8 text-3xl">Сброс пароля</h1>
+<p class="w-full mb-5 text-sm text-gray-600 pb-4">
+  Для сброса пароля введите новый пароль и нажмите на кнопку <b>Сбросить пароль</b>.
+</p>
+
+{{if not .Data}}
+<p class="w-full mb-5 text-sm text-gray-600 pb-4">
+  <b>Проверьте почту</b>, вам должно было прийти письмо для сброса пароля.<br>
+  Или введите присланный вам <b>токен</b> в поле <b>Токен</b>.
+</p>
+{{end}}
+
+<form
+  class="max-w-md"
+  action="/reset-pw"
+  method="post">
+  <p class="hidden">{{csrfInput}}</p>
+  <p class="flex flex-col my-5 gap-y-0.5">
+    <label for="password">Новый пароль</label>
+    <input
+      class="p-2 border-2 border-cyan-950"
+      id="password"
+      type="text"
+      name="password"
+      placeholder="Введите новый пароль">
+  </p>
+  {{if .Data }}
+  <p class="hidden">
+    <input
+      type="hidden"
+      name="token"
+      value="{{.Data}}">
+  </p>
+  {{else}}
+  <p class="flex flex-col my-5 gap-y-0.5">
+    <label for="token">Токен</label>
+    <input
+      class="p-2 border-2 border-cyan-950"
+      id="token"
+      type="text"
+      name="token"
+      placeholder="Введите токен">
+  </p>
+  {{end}}
+  <p class="my-8">
+    <button
+      class="block p-3 text-white bg-cyan-700 hover:bg-cyan-800 rounded"
+      type="submit">
+      Сбросить пароль
+    </button>
+  </p>
+</form>
+
+{{end}}

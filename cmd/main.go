@@ -86,6 +86,9 @@ func main() {
 
 		r.Get("/forgot-pw", user.ForgotPassword)
 		r.Post("/forgot-pw", user.ProcessForgotPassword)
+
+		r.Get("/reset-pw", user.ResetPassword)
+		r.Post("/reset-pw", user.ProcessResetPassword)
 	})
 
 	// Запуск сервера

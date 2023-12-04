@@ -93,3 +93,11 @@ func ProcessForgotPassword(ctx router.Ctx) error {
 		Data: userData,
 	})
 }
+
+func ProcessResetPassword(ctx router.Ctx) error {
+	w := router.ResponseWriter(ctx)
+
+	w.Write([]byte("Hello"))
+
+	return nil
+}

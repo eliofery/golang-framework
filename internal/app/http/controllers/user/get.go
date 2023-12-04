@@ -20,3 +20,11 @@ func SignIn(ctx router.Ctx) error {
 func ForgotPassword(ctx router.Ctx) error {
 	return tpl.Render(ctx, "user/forgot-pw", tpl.Data{})
 }
+
+func ResetPassword(ctx router.Ctx) error {
+	r := router.Request(ctx)
+
+	return tpl.Render(ctx, "user/reset-pw", tpl.Data{
+		Data: r.FormValue("token"),
+	})
+}
