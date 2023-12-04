@@ -144,6 +144,28 @@ func (s *Service) SignIn(user *User) error {
 	return nil
 }
 
+func (s *Service) UpdatePassword(us *User) error {
+	op := "model.user.UpdatePassword"
+
+	d := database.CtxDatabase(s.ctx)
+
+	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(us.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+	passwordHash := string(hashedBytes)
+
+	_, err = d.Exec(`
+        UPDATE users
+        SET password = $2
+        WHERE id = $1;`, us.ID, passwordHash)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
 func GetCurrentUser(r *http.Request) (*User, error) {
 	op := "model.user.CurrentUser"
 

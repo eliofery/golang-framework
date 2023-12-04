@@ -4,6 +4,7 @@ import (
 	pwreset "github.com/eliofery/golang-image/internal/app/models/password_reset"
 	"github.com/eliofery/golang-image/internal/app/models/user"
 	"github.com/eliofery/golang-image/pkg/cookie"
+	"github.com/eliofery/golang-image/pkg/errors"
 	"github.com/eliofery/golang-image/pkg/logging"
 	"github.com/eliofery/golang-image/pkg/router"
 	"github.com/eliofery/golang-image/pkg/tpl"
@@ -95,9 +96,35 @@ func ProcessForgotPassword(ctx router.Ctx) error {
 }
 
 func ProcessResetPassword(ctx router.Ctx) error {
-	w := router.ResponseWriter(ctx)
+	r, w, l := router.Request(ctx), router.ResponseWriter(ctx), logging.Logging(ctx)
 
-	w.Write([]byte("Hello"))
+	data := &struct {
+		Password string
+		Token    string
+	}{
+		Password: r.FormValue("password"),
+		Token:    r.FormValue("token"),
+	}
+
+	service := pwreset.NewService(ctx)
+	err := service.Consume(data)
+	if err != nil {
+		var pubErr errors.PublicError
+		if errors.As(err, &pubErr) {
+			l.Info(pubErr.Public())
+		} else {
+			l.Info(err.Error())
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+
+		return tpl.Render(ctx, "user/reset-pw", tpl.Data{
+			Data:   data,
+			Errors: []error{err},
+		})
+	}
+
+	http.Redirect(w, r, "/user", http.StatusFound)
 
 	return nil
 }

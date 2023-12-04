@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/eliofery/golang-image/internal/app/models/session"
 	"github.com/eliofery/golang-image/internal/app/models/user"
 	"github.com/eliofery/golang-image/pkg/database"
 	"github.com/eliofery/golang-image/pkg/email"
@@ -16,7 +17,14 @@ import (
 	"time"
 )
 
-const DefaultResetDuration = 1 * time.Minute
+const (
+	DefaultResetDuration = 1 * time.Minute
+)
+
+var (
+	ErrNotFount     = errors.New("заданный токен не существует")
+	ErrTokenExpired = errors.New("токен просрочен")
+)
 
 type PasswordReset struct {
 	ID        uint      `validate:"omitempty"`
@@ -98,6 +106,73 @@ func (s *Service) Create(us *user.User) error {
 	       <p>В противном случае перейдите по ссылке: <a href="` + resetUrl + `">` + resetUrl + `</a></p>
 	   `,
 	})
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+func (s *Service) Consume(data *struct{ Password, Token string }) error {
+	op := "model.pwreset.Consume"
+
+	d, v := database.CtxDatabase(s.ctx), validate.Validation(s.ctx)
+
+	err := v.Var(data.Password, "required,gte=10,lte=32")
+	if err != nil {
+		return err
+	}
+
+	us := &user.User{}
+	pwReset := &PasswordReset{
+		ExpiresAt: time.Now().Add(DefaultResetDuration),
+	}
+	tokenHash := rand.HashToken(data.Token)
+
+	row := d.QueryRow(`
+        SELECT password_reset.id, password_reset.expires_at, users.id, users.email, users.password
+        FROM password_reset
+        INNER JOIN users ON users.id = password_reset.user_id
+        WHERE password_reset.token_hash = $1;`, tokenHash)
+	err = row.Scan(&pwReset.ID, &pwReset.ExpiresAt, &us.ID, &us.Email, &us.Password)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return errors.Public(err, ErrNotFount.Error())
+		}
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	err = s.Delete(pwReset)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	if time.Now().After(pwReset.ExpiresAt) {
+		return errors.Public(nil, fmt.Sprintf("%s: %s", ErrTokenExpired, data.Token))
+	}
+
+	service := user.NewService(s.ctx)
+	err = service.UpdatePassword(us)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	err = session.NewService(s.ctx).Create(&session.Session{UserID: us.ID})
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+func (s *Service) Delete(pwReset *PasswordReset) error {
+	op := "model.pwreset.Delete"
+
+	d := database.CtxDatabase(s.ctx)
+
+	_, err := d.Exec(`
+        DELETE FROM password_reset
+        WHERE id = $1;`, pwReset.ID)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
