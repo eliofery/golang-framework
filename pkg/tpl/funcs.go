@@ -1,9 +1,9 @@
 package tpl
 
 import (
-	"github.com/eliofery/golang-image/internal/app/models/user"
-	"github.com/eliofery/golang-image/pkg/errors"
-	"github.com/eliofery/golang-image/pkg/validate"
+	"github.com/eliofery/golang-framework/internal/app/models/user"
+	"github.com/eliofery/golang-framework/pkg/errors"
+	"github.com/eliofery/golang-framework/pkg/validate"
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/csrf"
 	"html/template"

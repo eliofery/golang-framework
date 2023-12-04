@@ -1,6 +1,6 @@
 package tpl
 
-import "github.com/eliofery/golang-image/pkg/errors"
+import "github.com/eliofery/golang-framework/pkg/errors"
 
 type Data struct {
 	Meta   Meta

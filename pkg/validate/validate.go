@@ -2,7 +2,7 @@ package validate
 
 import (
 	"context"
-	"github.com/eliofery/golang-image/pkg/logging"
+	"github.com/eliofery/golang-framework/pkg/logging"
 	"github.com/go-playground/locales/en"
 	"github.com/go-playground/locales/ru"
 	ut "github.com/go-playground/universal-translator"

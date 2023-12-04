@@ -2,13 +2,13 @@ package home
 
 import (
 	"fmt"
-	"github.com/eliofery/golang-image/pkg/cookie"
-	"github.com/eliofery/golang-image/pkg/database"
-	"github.com/eliofery/golang-image/pkg/email"
-	"github.com/eliofery/golang-image/pkg/logging"
-	"github.com/eliofery/golang-image/pkg/rand"
-	"github.com/eliofery/golang-image/pkg/router"
-	"github.com/eliofery/golang-image/pkg/tpl"
+	"github.com/eliofery/golang-framework/pkg/cookie"
+	"github.com/eliofery/golang-framework/pkg/database"
+	"github.com/eliofery/golang-framework/pkg/email"
+	"github.com/eliofery/golang-framework/pkg/logging"
+	"github.com/eliofery/golang-framework/pkg/rand"
+	"github.com/eliofery/golang-framework/pkg/router"
+	"github.com/eliofery/golang-framework/pkg/tpl"
 )
 
 func Index(ctx router.Ctx) error {

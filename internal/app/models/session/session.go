@@ -3,11 +3,11 @@ package session
 import (
 	"context"
 	"fmt"
-	"github.com/eliofery/golang-image/pkg/cookie"
-	"github.com/eliofery/golang-image/pkg/database"
-	"github.com/eliofery/golang-image/pkg/rand"
-	"github.com/eliofery/golang-image/pkg/router"
-	"github.com/eliofery/golang-image/pkg/validate"
+	"github.com/eliofery/golang-framework/pkg/cookie"
+	"github.com/eliofery/golang-framework/pkg/database"
+	"github.com/eliofery/golang-framework/pkg/rand"
+	"github.com/eliofery/golang-framework/pkg/router"
+	"github.com/eliofery/golang-framework/pkg/validate"
 )
 
 type Session struct {

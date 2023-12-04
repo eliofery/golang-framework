@@ -1,7 +1,7 @@
 package tpl
 
 import (
-	"github.com/eliofery/golang-image/internal/resources"
+	"github.com/eliofery/golang-framework/internal/resources"
 	"github.com/go-chi/chi/v5"
 	"net/http"
 )

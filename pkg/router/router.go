@@ -2,7 +2,7 @@ package router
 
 import (
 	"context"
-	"github.com/eliofery/golang-image/pkg/logging"
+	"github.com/eliofery/golang-framework/pkg/logging"
 	"github.com/go-chi/chi/v5"
 	"net/http"
 )

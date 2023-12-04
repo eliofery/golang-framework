@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"github.com/eliofery/golang-image/internal/database"
+	"github.com/eliofery/golang-framework/internal/database"
 	"github.com/pressly/goose/v3"
 )
 

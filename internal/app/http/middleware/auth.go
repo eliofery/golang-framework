@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/eliofery/golang-image/internal/app/models/user"
+	"github.com/eliofery/golang-framework/internal/app/models/user"
 	"net/http"
 )
 

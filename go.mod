@@ -1,4 +1,4 @@
-module github.com/eliofery/golang-image
+module github.com/eliofery/golang-framework
 
 go 1.21.4
 

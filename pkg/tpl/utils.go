@@ -2,7 +2,7 @@ package tpl
 
 import (
 	"fmt"
-	"github.com/eliofery/golang-image/internal/resources"
+	"github.com/eliofery/golang-framework/internal/resources"
 	"html/template"
 	"io/fs"
 	"net/http"

@@ -1,13 +1,13 @@
 package user
 
 import (
-	pwreset "github.com/eliofery/golang-image/internal/app/models/password_reset"
-	"github.com/eliofery/golang-image/internal/app/models/user"
-	"github.com/eliofery/golang-image/pkg/cookie"
-	"github.com/eliofery/golang-image/pkg/errors"
-	"github.com/eliofery/golang-image/pkg/logging"
-	"github.com/eliofery/golang-image/pkg/router"
-	"github.com/eliofery/golang-image/pkg/tpl"
+	pwreset "github.com/eliofery/golang-framework/internal/app/models/password_reset"
+	"github.com/eliofery/golang-framework/internal/app/models/user"
+	"github.com/eliofery/golang-framework/pkg/cookie"
+	"github.com/eliofery/golang-framework/pkg/errors"
+	"github.com/eliofery/golang-framework/pkg/logging"
+	"github.com/eliofery/golang-framework/pkg/router"
+	"github.com/eliofery/golang-framework/pkg/tpl"
 	"net/http"
 )
 
